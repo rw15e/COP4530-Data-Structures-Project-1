@@ -1,0 +1,371 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<!-- saved from url=(0049)http://www.cs.fsu.edu/~myers/cop4530/hw/hw01.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    
+  
+    
+  <meta name="GENERATOR" content="Mozilla/4.79 [en] (Win98; U) [Netscape]">
+    
+  <meta name="Author" content="Bob Myers">
+  <title>assignment 1</title>
+</head>
+
+<body text="#000000" bgcolor="#ffffff">
+  
+<h2>Programming Assignment #1</h2>
+Due: Thurs, Sept 28 (11:59 PM)
+
+<h2>Objective</h2>
+This assignment will provide practice with a doubly-linked list, along 
+with practice on the basic concept of an iterator over a container.
+
+<h2>Task</h2>
+
+In your prior course, you probably saw an example of a singly-linked 
+list.  Here is a simple example of such a container, implemented as a 
+template class:  
+<ul>
+<li><a href="http://www.cs.fsu.edu/~myers/deitel5c++/ch21/Fig21_03_05/">
+Singly-Linked List class example</a></li>
+</ul>
+
+<p>For this assignment you will implement a templated doubly-linked list 
+class, along with an associated iterator class for helping with generic 
+list traversals. In a doubly-linked list, each node has a pointer to the 
+next node AND a pointer to the previous node. The following starter 
+files are provided for you:
+
+</p><ul>
+
+<li><a href="http://www.cs.fsu.edu/~myers/cop4530/hw/hw1files/tnode.h"><tt>tnode.h</tt></a> -- fully defines a 
+templated node class for use in a doubly-linked list.  Note that the 
+member data includes a data element, as well as pointers to the next and 
+previous nodes. </li>
+
+<li><a href="http://www.cs.fsu.edu/~myers/cop4530/hw/hw1files/tlist.h"><tt>tlist.h</tt></a> -- provides the 
+<b>declarations</b> of the template classes <tt>TList</tt> (the linked 
+list class) and <tt>TListIterator</tt> (an associated class to help with 
+list traversal). </li>
+
+<li><a href="http://www.cs.fsu.edu/~myers/cop4530/hw/hw1files/driver.cpp"><tt>driver.cpp</tt></a> -- contains 
+some sample test calls to the linked list, but should not be considered 
+a complete or thorough set of tests. You will need to create more test 
+cases to fully test your class features.  This driver is provided to 
+help illustrate some of the basic class features and concepts, including 
+the use of iterators.</li>
+
+<li><a href="http://www.cs.fsu.edu/~myers/cop4530/hw/hw1files/driver_output.txt"><tt>driver_output.txt</tt></a> 
+-- contains the output from running the above sample driver program 
+</li>
+
+</ul>
+
+
+<p>Your job will be to finish this templated set of classes by defining 
+each of the functions in the <tt>TList</tt> and <tt>TListIterator</tt> 
+classes.  These should be defined in a file called:
+</p><ul><tt>tlist.hpp</tt></ul>
+
+Note that there is already a <tt>#include</tt> at the bottom of 
+<tt>tlist.h</tt> where your definition file will be brought in.  This 
+illustrates a pretty standard format for setting up a templated class.
+<br>&nbsp;
+
+<h2>Iterators</h2>
+
+The small class called <tt>TListIterator</tt> is a helper class that 
+can be used in conjunction with the linked list class.  This is a common 
+feature used in container classes like this.  The purpose of an iterator 
+is to provide a common and non-implementation-specific way of traversing 
+a container, so that mulitple containers could potentially use common 
+algorithms (like sorting and searching functions, for example).  This 
+will be explored more in the course.  For the iterator class in this 
+assignment, here is a brief sample use:
+
+<pre>  // suppose that L is a linked list storing ints, and it has 
+  //   already been populated with the values 3, 6, 9, 12, 15, 18, 21
+
+  // this call would retrieve a list iterator over the container L
+  TListIterator&lt;int&gt; itr = L.GetIterator();
+
+  // at this point, itr currently is positioned at the first element in 
+  // the list (the 3).
+
+  int x = itr.GetValue();		// x would now store 3
+  itr.Next();				// itr has advanced to the 6
+  int y = itr.GetValue();		// y would now store 6
+  itr.Next();
+  itr.Next();				// we have now advanced to the 12
+  int z = itr.GetValue();		// z now stores 12
+ 
+  itr.Previous();			// now we have moved backwards, to the 9
+  int a = itr.GetValue();		// a stores 9.    etc.
+</pre>
+This class essentially helps us walk through the linked list in a fairly 
+easy way, with calls to <tt>Next()</tt> and <tt>Previous()</tt> to move 
+around.
+
+
+<h2>Program Details</h2>
+
+Here are general descriptions of the two classes you are to define, 
+along with a general description of each function's task.
+
+<h3>1) class TList</h3>
+
+The member data of this class consists of pointers to the first and last 
+nodes, a size variable, and a dummy variable of type T that can be used 
+for error-checking situations. Specifically, some of the functions 
+specify to return a stored data item, but if you encounter a situation 
+like an empty list or other situation where there would not BE a valid 
+data item, you can return a reference to the dummy object instead. This 
+is needed because some such functions are pass-by-reference (so that the 
+retrieved item can be modified by the caller under normal situations).
+
+<p>Function descriptions
+</p><ul>
+<li><b>Default constructor</b> -- creates an empty linked list
+<br>&nbsp;
+</li>
+
+<li><b>TList(T val, int num)</b> -- creates a linked list containing 
+"num" copies of the data element "val"
+<br>&nbsp;
+</li>
+
+<li><b>Clear</b> -- clear out the list, resetting it to an empty list
+<br>&nbsp;
+</li>
+
+<li><b>Big Five</b>
+ <ul>
+ <li>Destructor -- appropriate clean-up of list, no memory leaks</li>
+ <li>Copy constructor -- deep copy</li>
+ <li>Copy assignment operator -- deep copy</li>
+ <li>Move constructor -- constructor with standard move semantics</li>
+ <li>Move assignment operator -- assignment with standard move semantics</li>
+ </ul>
+<br>
+</li>
+
+<li><b>Accessors</b>
+ <ul>
+ <li><b>IsEmpty</b> -- returns true if the list is empty, false otherwise</li>
+ <li><b>GetSize</b> -- returns the size (number of data elements) in the 
+     list</li>
+ <li><b>GetFirst</b> -- returns the data element in the first node 
+     (by reference)</li>
+ <li><b>GetLast</b> -- returns the data element in the last node 
+     (by reference)</li>
+ </ul>
+ Note that error situations in the last two functions would occur if the 
+ list was empty (this what the "dummy" item is for).
+<br>&nbsp;
+</li>
+
+<li><b>Endpoint insert/removes</b>
+ <ul>
+ <li><b>InsertFront</b> -- insert the data (parameter) as the first node 
+        in the list</li>
+ <li><b>InsertBack</b> -- insert the data (parameter) as the last node 
+        in the list</li>
+ <li><b>RemoveFront</b> -- remove the first element in the list. If the 
+       list is empty, just leave it empty</li>
+ <li><b>RemoveBack</b> -- remove the last element in the list. If the 
+       list is empty, just leave it empty</li>
+ </ul>
+<br>
+</li>
+
+<li><b>Iterator retrieval</b>
+ <ul>
+ <li><b>GetIterator</b> -- create and return an iterator that is 
+positioned on the first node in the list. If list is empty, return 
+default iterator</li>
+ <li><b>GetIteratorEnd</b> -- create and return an iterator that is 
+positioned on the last node in the list. If list is empty, return 
+default iterator</li>
+ </ul>
+<br>
+</li>
+
+<li><b>Insert (2 parameters)</b>
+<br>The new data element (second parameter) should be inserted into the 
+linked list just <i>before</i> the position given by the iterator (the 
+first parameter).  If the list is empty, just insert the single item. If 
+the iterator doesn't refer to a node, insert the item at the end of the 
+list.
+<br>&nbsp;
+</li>
+
+<li><b>Remove (1 parameter)</b>
+<br>This function should remove the data item that is given by the 
+iterator (the parameter).  The function should return an iterator to the 
+node that is <b>after</b> the one that was just deleted.  If the initial 
+list was empty, there's nothing to delete -- so just leave it empty and 
+return a default iterator.
+<br>&nbsp;
+</li>
+
+<li><b>Print</b>
+<br>Should print the entire list contents, front to back, separated by 
+the delimiter given in the second parameter. This function 
+may assume that the stored type T has an available insertion &lt;&lt; 
+operator available for printing. Print to the stream given in the first 
+parameter.  
+<br>&nbsp;
+</li>
+
+<li><b><tt>operator+</tt></b>
+<br>This is a standalone function that should return a TList object 
+that is the result of concatenating two TList objects together -- in 
+parameter order.  See driver.cpp program for examples.
+<br>&nbsp;
+</li>
+
+</ul>
+
+
+<h3>2) class TListIterator</h3>
+
+The TListIterator class has only one member data variable -- a pointer 
+to the Node to which it currently refers (we'll call this the current 
+node in the function descriptions below).
+
+<ul>
+
+<li><b>Default constructor</b> -- a default iterator should just store 
+the nunll pointer internally.
+</li>
+
+<li><b>HasNext</b> -- returns true if there is another node <i>after</i> 
+the current node, false otherwise
+</li>
+
+<li><b>HasPrevious</b> -- returns true if there is another node <i>before</i> 
+the current node, false otherwise
+</li>
+
+<li><b>Next</b> -- advances the iterator to the next node after the 
+current one.  Returns an iterator to the new position.
+</li>
+
+<li><b>Previous</b> -- moves the iterator to the previous node (before 
+the current one).  Returns an iterator to the new position.
+</li>
+
+<li><b>GetData</b> -- return the <i>data item</i> at the current node. 
+If the iterator is not pointing to a node (i.e. null pointer), you can 
+use the "dummy" that was defined previously.  Note that this is a return 
+by reference.
+</li>
+
+</ul>
+
+Define all of the functions for these two classes in the file 
+<tt>tlist.hpp</tt>
+
+<br>
+<h3>3) Test Program</h3>
+
+Create a test program of your own in the file 
+<b><tt>mydriver.cpp</tt></b>.  You can use my provided driver.cpp as a 
+general model of how to populate a linked list.  Your test program 
+should contain the following tests/illustrations at a minimum:
+
+<ul>
+<li>Tests of all of the functions</li>
+<li>Tests that involve Linked Lists of at least two different stored 
+types.  Suggested types:  int, double, char, string</li>
+<li>At least 10 tests of each of the following
+ <ul>
+ <li>InsertFront</li>
+ <li>InsertBack</li>
+ <li>RemoveFront</li>
+ <li>RemoveBack</li>
+ <li>Insert (iterator-based)</li>
+ <li>Remove (iterator-based)</li>
+ </ul>
+ The tests for each of these should not be all in a row for any single 
+one.  I.e. for best testing, make sure that insert/remove calls of a 
+single function type are frequently interspersed between other types.  
+(This way, a mistake in one will often be revealed by later calls to 
+others)
+</li>
+
+<li>Clear illustrations of list contents with Print before and after 
+major sets of insert/delete tests.  Make your outputs readable and 
+easy to follow for best testing/results.</li>
+
+<li>At least one test that uses an iterator to traverse the list front 
+to back</li>
+
+<li>At least one test that uses an iterator to traverse the list back 
+to front</li>
+
+</ul>
+
+<h3>4) makefile</h3>
+
+Create a makefile that configures a build of both my provided driver 
+(driver.cpp) and your test program (mydriver.cpp).  i.e. when you type 
+"make" in the directory, it should compile and build both executables.  
+Make your executables named "driver.x" and "mydriver.x", respectively.
+
+<h3>5) General Requirements</h3>
+
+<ul>
+<li>Document your code appropriately so that it is readable and easy to 
+navigate</li>
+
+<li>You may use standard C++ I/O libraries, as well as class libraries 
+like <tt>string</tt>.  You may <b>NOT</b> use any of the container class 
+libraries from the STL</li>
+
+<li>If you wish to add any helper functions to the TList class, you may 
+modify the tlist.h file for this purpose.  But do NOT change any of the 
+expected interface function prototypes or add extra member data.  Any 
+helper functions you write should be in the private section</li>
+
+<li>Make sure your files compile and run on linprog.cs.fsu.edu with 
+g++, using the C++11 standard compilation flag.  This is where they 
+will be tested and graded</li>
+</ul>
+
+
+
+<hr>
+
+<h3>Deliverables and submitting</h3>
+
+These are the deliverable files you should submit:
+<pre>  tlist.h
+  tlist.hpp
+  mydriver.cpp
+  makefile
+</pre>
+
+To submit, package up your files in a tar archive and upload this at the 
+assignment submission link on the Blackboard course site (in the 
+"Assignments" section).  Your tar file should be named in this format, 
+all lowercase:
+
+<pre>   <i>lastname_firstname_p1.tar</i>
+
+   Example:  My tar file would be:    <b>myers_bob_p1.tar</b>
+</pre>
+
+After submitting, make sure to download your submission and verify it is 
+correct.  You are responsible for submitting the correct version of your 
+assignment.  If you cannot download your submission, contact the 
+Blackboard support team at FSU.
+
+<p>Note that in addition to the provided test cases, we will also test 
+your program/classes using additional test programs.  Your program must 
+be able to pass all such test cases to obtain a full score for the 
+corresponding components.
+
+
+
+
+</p></body></html>
